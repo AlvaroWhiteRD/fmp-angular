@@ -1,0 +1,170 @@
+<body class="container">
+
+    <div class="justify-content-center">
+        <p></p>
+        <p></p>
+
+        <h3>Informacion de productos</h3>
+
+        <p></p>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalregister">
+            REGISTRAR NUEVO PRODUCTO
+        </button>
+
+
+        <p></p>
+        <app-loading *ngIf="loading" style="padding-bottom: 10px;"></app-loading>
+
+        <p></p>
+        <p></p>
+        <div>
+
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+
+                        <th scope="col " class="text-center">Codigo</th>
+                        <th scope="col " class="text-center">Nombre</th>
+                        <th scope="col " class="text-center">Descripcion</th>
+                        <th scope="col " class="text-center">Precio</th>
+                        <th scope="col " class="text-center">Eliminar</th>
+                        <th scope="col " class="text-center">Actualizar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of productList | paginate:pageSize:pageNumber">
+                        <th scope="" class="text-center">{{item.productCode}}</th>
+                        <td class="text-center">{{item.productName}}</td>
+                        <td class="text-center">{{item.productDescription}}</td>
+                        <td class="text-center">{{item.priceOfTheProduct}}</td>
+                        <td class="text-center">
+                            <button class="btn btn-danger btn-radius" (click)="DeleteProductModal(item.id!)" data-toggle="modal" data-target="#modaldelete">Eliminar</button>
+                        </td>
+                        <td class="text-center">
+                            <button data-toggle="modal" data-target="#modalupdate" (click)="GetProductDetailById(item.id!)" class="btn btn-info btn-radius">Actualizar</button>
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <!--paginacion-->
+    <mat-paginator [length]="productList.length" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" (page)="HandlePages($event)">
+    </mat-paginator>
+
+    <!-- Modal Registro-->
+
+    <div class="modal fade" id="modalregister" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Registro de nuevos productos</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="registerProductFormGroup" (ngSubmit)="CreateNewProduct()">
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">Nombre:.</label>
+                            <input formControlName="ProductName" type="text" class="form-control" placeholder="Nombre del producto">
+                            <span class="text-danger ml-2" *ngIf="registerProductFormGroup.get('ProductName')?.hasError('required') && registerProductFormGroup.get('ProductName')?.touched">
+                                * Nombre del producto es <strong>requerido</strong>
+                             </span>
+                        </div>
+                        <div class="form-group">
+                            <label for="formGroupExampleInput2">Descripcion:.</label>
+                            <input formControlName="ProductDescription" type="text" class="form-control" placeholder="Descripcion del producto">
+                            <span class="text-danger ml-2" *ngIf="registerProductFormGroup.get('ProductDescription')?.hasError('required') && registerProductFormGroup.get('ProductDescription')?.touched">
+                                * Descripcion del producto es <strong>requerido</strong>
+                             </span>
+                        </div>
+                        <div class="form-group">
+                            <label for="formGroupExampleInput2">Precio:.</label>
+                            <input formControlName="PriceOfTheProduct" type="text" class="form-control" placeholder="Precio del producto">
+                            <span class="text-danger ml-2" *ngIf="registerProductFormGroup.get('PriceOfTheProduct')?.hasError('required') && registerProductFormGroup.get('PriceOfTheProduct')?.touched">
+                                * Precio del producto es <strong>requerido</strong>
+                             </span>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Guardar Producto</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal actualizar-->
+    <div class="modal fade" id="modalupdate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Registro de nuevos productos</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="registerProductFormGroup" (ngSubmit)="UpdateProduct()">
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">Nombre:.</label>
+                            <input formControlName="ProductName" type="text" class="form-control" placeholder="Nombre del producto">
+                            <span class="text-danger ml-2" *ngIf="registerProductFormGroup.get('ProductName')?.hasError('required') && registerProductFormGroup.get('ProductName')?.touched">
+                                * Nombre del producto es <strong>requerido</strong>
+                             </span>
+                        </div>
+                        <div class="form-group">
+                            <label for="formGroupExampleInput2">Descripcion:.</label>
+                            <input formControlName="ProductDescription" type="text" class="form-control" placeholder="Descripcion del producto">
+                            <span class="text-danger ml-2" *ngIf="registerProductFormGroup.get('ProductDescription')?.hasError('required') && registerProductFormGroup.get('ProductDescription')?.touched">
+                                * Descripcion del producto es <strong>requerida</strong>
+                             </span>
+                        </div>
+                        <input formControlName="Id" type="hidden" class="form-control" placeholder="ID">
+                        <input formControlName="ProductCode" type="hidden" class="form-control" placeholder="ID">
+
+                        <div class="form-group">
+                            <label for="formGroupExampleInput2">Precio:.</label>
+                            <input formControlName="PriceOfTheProduct" type="text" class="form-control" placeholder="Precio del producto">
+                            <span class="text-danger ml-2" *ngIf="registerProductFormGroup.get('PriceOfTheProduct')?.hasError('required') && registerProductFormGroup.get('PriceOfTheProduct')?.touched">
+                                * Precio del producto es <strong>requerido</strong>
+                             </span>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Actualizar Producto</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal eliminar -->
+    <div class="modal fade" id="modaldelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Producto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-danger">¿Seguro que deseas eliminar este producto?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger" (click)="DeleteProduct()" data-dismiss="modal">Eliminar Producto</button>
+                </div>
+            </div>
+        </div>
+    </div>
